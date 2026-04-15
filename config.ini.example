@@ -1,0 +1,8 @@
+
+[gemini]
+api_key = you api_key
+api_base_url = http://152.53.90.90:3000
+
+
+max_workers = 4
+network_workers_cap = 4

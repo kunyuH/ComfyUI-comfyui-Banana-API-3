@@ -1,0 +1,14 @@
+.env
+.claude
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.exclude
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+.c
