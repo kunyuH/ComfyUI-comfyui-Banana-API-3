@@ -517,4 +517,4 @@ class BananaImageNode:
 
 # 注册节点
 NODE_CLASS_MAPPINGS = {"HeiHe001_BananaImageNode": BananaImageNode}
-NODE_DISPLAY_NAME_MAPPINGS = {"HeiHe001_BananaImageNode": "Banana-API-3"}
+NODE_DISPLAY_NAME_MAPPINGS = {"HeiHe001_BananaImageNode": "Semir Banana"}
