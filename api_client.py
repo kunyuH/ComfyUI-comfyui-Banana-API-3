@@ -334,8 +334,8 @@ class GeminiApiClient:
         if model.startswith("v1beta/"):
             model = model.split("/", 1)[1]
 
-        # self.logger.info(f'1=================={base_url}')
-        # self.logger.info(f'2=================={model_type}')
+        self.logger.info(f'1=================={base_url}')
+        self.logger.info(f'2=================={model_type}')
 
         if base.endswith(":generateContent"):
             return base
@@ -348,7 +348,7 @@ class GeminiApiClient:
         if "/models/" in base:
             return f"{base.rstrip('/')}:generateContent"
 
-        # self.logger.info(f'3=================={base}/v1beta/models/{model}:generateContent')
+        self.logger.info(f'3=================={base}/v1beta/models/{model}:generateContent')
         return f"{base}/v1beta/models/{model}:generateContent"
 
     def send_request(
