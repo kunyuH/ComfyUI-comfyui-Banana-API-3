@@ -159,6 +159,9 @@ class GeminiApiClient:
             "generationConfig": generation_config,
         }
 
+        # 调试日志：输出完整的请求数据
+        self.logger.info(f"请求数据: {json.dumps(request_body, ensure_ascii=False)}")
+
         return request_body
 
     # --- HTTP 发送逻辑 ----------------------------------------------------
@@ -194,6 +197,7 @@ class GeminiApiClient:
         让网络请求在长耗时阶段也能响应 ComfyUI 的中断。
         使用后台线程发起请求，主线程轮询中断标志，必要时关闭 session 终止阻塞。
         """
+
         if self.interrupt_checker is None:
             return session.post(
                 url,
@@ -411,6 +415,13 @@ class GeminiApiClient:
 
             start = time.time()
             try:
+                # 输出请求 URL 和参数信息
+                self.logger.info(f"========== 请求信息 ==========")
+                self.logger.info(f"请求 URL: {url}")
+                self.logger.info(f"请求 Headers: {json.dumps({k: v for k, v in headers.items() if k.lower() != 'authorization' and k.lower() != 'x-api-key'}, ensure_ascii=False)}")
+                self.logger.info(f"请求 Payload: {payload.decode('utf-8')}")
+                self.logger.info(f"==============================")
+
                 response = self._interruptible_post(
                     session,
                     url,
