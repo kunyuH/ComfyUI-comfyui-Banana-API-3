@@ -5,7 +5,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
-*.exclude
+*.ini
 .DS_Store
 Thumbs.db
 .idea/
