@@ -75,8 +75,8 @@ class BananaImageNode:
                     "default": "Peace and love",
                     "tooltip": "生成图像的文本提示词，可多行描述内容、风格等"
                 }),
-                "model_type": (["gemini-3-pro-image-preview-vip", "gemini-3.1-flash-image-preview"], {
-                    "default": "gemini-3.1-flash-image-preview",
+                "model_type": (["banana 2", "banana pro"], {
+                    "default": "banana 2",
                     "tooltip": "模型名称"
                 }),
                 "batch_size": ("INT", {
@@ -292,11 +292,24 @@ class BananaImageNode:
             logger.error(f"错误: {error_msg}")
             return self._build_failure_result(i, current_seed, error_msg)
 
-    def generate_images(self, prompt, model_type="gemini-2.0-flash-exp",
+    def generate_images(self, prompt, model_type="banana 2",
                        batch_size=1, aspect_ratio="Auto", imageSize="2K", seed=-1, top_p=0.95, max_workers=None,
                        image_1=None, image_2=None, image_3=None,
                        image_4=None, image_5=None, image_6=None, image_7=None,
                        image_8=None, image_9=None, 超时秒数=0, 绕过代理=None, 高峰模式=False, 禁用SSL验证=False):
+
+        if model_type == 'banana 2':
+            model_type = 'gemini-3.1-flash-image-preview-vip'
+        elif model_type == 'banana pro':
+            model_type = 'gemini-3-pro-image-preview-vip'
+        else:
+            error_msg = "模型选择错误！"
+            logger.error(error_msg)
+            error_tensor = self.error_canvas.build_error_tensor_from_text(
+                "模型错误",
+                f"{error_msg}\n请在选择有效模型!"
+            )
+            return (error_tensor, error_msg)
 
         # 从 config.ini 读取 API Key 和 Base URL
         effective_base_url = self.config_manager.get_effective_api_base_url()
