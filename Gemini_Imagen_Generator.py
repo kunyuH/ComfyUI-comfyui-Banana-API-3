@@ -75,16 +75,6 @@ class BananaImageNode:
                     "default": "Peace and love",
                     "tooltip": "生成图像的文本提示词，可多行描述内容、风格等"
                 }),
-                "api_key": ("STRING", {
-                    "default": "",
-                    "multiline": False,
-                    "tooltip": "调用服务的 API Key；留空则优先使用 config.ini 中的配置"
-                }),
-                "api_base_url": ("STRING", {
-                    "default": "",
-                    "multiline": False,
-                    "tooltip": "API 服务地址；留空则使用 config.ini 中的配置"
-                }),
                 "model_type": (["gemini-3-pro-image-preview-vip", "gemini-3.1-flash-image-preview"], {
                     "default": "gemini-3.1-flash-image-preview",
                     "tooltip": "模型名称"
@@ -302,47 +292,17 @@ class BananaImageNode:
             logger.error(f"错误: {error_msg}")
             return self._build_failure_result(i, current_seed, error_msg)
 
-    def generate_images(self, prompt, api_key="", api_base_url="", model_type="gemini-2.0-flash-exp",
+    def generate_images(self, prompt, model_type="gemini-2.0-flash-exp",
                        batch_size=1, aspect_ratio="Auto", imageSize="2K", seed=-1, top_p=0.95, max_workers=None,
                        image_1=None, image_2=None, image_3=None,
                        image_4=None, image_5=None, image_6=None, image_7=None,
                        image_8=None, image_9=None, 超时秒数=0, 绕过代理=None, 高峰模式=False, 禁用SSL验证=False):
 
-        # 解析 API Key：优先使用节点输入，留空时回退 config
-        # 其中以 "fix" 前缀开头的 Key 视为前台临时测试模式，仅在节点侧临时切换 Base URL，
-        # 不依赖额外的后端配置文件或余额查询逻辑。
-        raw_input_key = (api_key or "").strip()
-
-        # 解析 API Base URL：优先使用节点输入，留空时回退 config
-        raw_input_url = (api_base_url or "").strip()
-        if raw_input_url:
-            effective_base_url = raw_input_url
-        else:
-            effective_base_url = self.config_manager.get_effective_api_base_url()
-        resolved_api_key: Optional[str] = None
-        is_fix_mode = False
-
-        if raw_input_key.lower().startswith(self._FIX_API_KEY_PREFIX):
-            stripped_key = raw_input_key[len(self._FIX_API_KEY_PREFIX):]
-            resolved_api_key = self.config_manager.sanitize_api_key(stripped_key)
-            if resolved_api_key:
-                is_fix_mode = True
-                # 只有在用户没有直接输入 URL 时，才使用 fix 模式的内部测试 URL
-                if not raw_input_url:
-                    try:
-                        # 仅在节点内解码内部测试 Base URL，不通过 config 体系暴露
-                        effective_base_url = self.config_manager._decode_api_base_url(  # type: ignore[attr-defined]
-                            self._FIX_API_BASE_URL_ENC
-                        )
-                    except Exception as exc:  # pragma: no cover
-                        logger.warning(f"解码内部测试 Base URL 失败，将回退到默认配置: {exc}")
-                        effective_base_url = self.config_manager.get_effective_api_base_url()
-
-        if not is_fix_mode:
-            sanitized_input_key = self.config_manager.sanitize_api_key(api_key)
-            resolved_api_key = sanitized_input_key or self.config_manager.sanitize_api_key(
-                self.config_manager.load_api_key()
-            )
+        # 从 config.ini 读取 API Key 和 Base URL
+        effective_base_url = self.config_manager.get_effective_api_base_url()
+        resolved_api_key: Optional[str] = self.config_manager.sanitize_api_key(
+            self.config_manager.load_api_key()
+        )
 
         # 验证API key
         if not resolved_api_key:
